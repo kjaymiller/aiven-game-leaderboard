@@ -37,8 +37,8 @@ several events can run on the same dates. You never need a developer or a deploy
 
 - The **leaderboard page** has game and event pickers (it only offers events that run the chosen
   game); `…/leaderboard?game=<game>&event=<slug>` links straight to one board.
-- In `/admin`, on the **Scores** tab, use the **event filter** to see just that event's entrants. **Export CSV** and
-  **Export claimed only** follow the filter, so the prize draw uses that event's list only.
+- In `/admin`, on the **Scores** tab, use the **event filter** to see just that event's entrants. **Export CSV**
+  follows the filter, so the prize draw uses that event's list only.
 - Junk or test entries: **Edit** or delete them in the table before drawing.
 
 ## Good to know

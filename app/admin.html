@@ -486,9 +486,6 @@
               <option value="none">No event</option>
             </select>
             <button id="export-all">Export CSV</button>
-            <button class="secondary" id="export-claimed">
-              Export claimed only
-            </button>
             <button class="secondary" id="refresh">Refresh</button>
           </div>
 
@@ -502,7 +499,6 @@
                   <th>Email</th>
                   <th style="text-align: right">Score</th>
                   <th style="text-align: right">Secondary</th>
-                  <th>Status</th>
                   <th>Game</th>
                   <th>Source</th>
                   <th>Event</th>
@@ -583,7 +579,6 @@
                 <tr>
                   <th>Event</th>
                   <th>Window (UTC)</th>
-                  <th>Status</th>
                   <th>Game</th>
                   <th>Links (click to copy)</th>
                   <th>QR codes</th>
@@ -759,7 +754,6 @@
                   <th>Token starts</th>
                   <th>Created</th>
                   <th>Last used</th>
-                  <th>Status</th>
                   <th></th>
                 </tr>
               </thead>
@@ -825,7 +819,6 @@
                         <td><input type="email" data-field="email" value="${escapeHtml(score.email)}" placeholder="email"></td>
                         <td class="savings">${escapeHtml(score.score_display)}</td>
                         <td class="bill">${escapeHtml(score.secondary_display) || "—"}</td>
-                        <td><span class="pill ${score.claimed ? "claimed" : "unclaimed"}">${score.claimed ? "claimed" : "unclaimed"}</span></td>
                         <td class="company">${escapeHtml(score.game)}</td>
                         <td class="company">${escapeHtml(score.source)}</td>
                         <td class="company">${escapeHtml(score.event) || "—"}</td>
@@ -845,7 +838,6 @@
                     <td class="email">${escapeHtml(score.email) || "—"}</td>
                     <td class="savings">${escapeHtml(score.score_display)}</td>
                     <td class="bill">${escapeHtml(score.secondary_display) || "—"}</td>
-                    <td><span class="pill ${score.claimed ? "claimed" : "unclaimed"}">${score.claimed ? "claimed" : "unclaimed"}</span></td>
                     <td class="company">${escapeHtml(score.game)}</td>
                         <td class="company">${escapeHtml(score.source)}</td>
                     <td class="company">${escapeHtml(score.event) || "—"}</td>
@@ -885,10 +877,9 @@
           message.classList.add("hidden");
         }
 
-        const claimed = scores.filter((s) => s.claimed).length;
         el("count-scores").textContent = scores.length;
         el("summary").textContent =
-          `${scores.length} scores · ${claimed} claimed` +
+          `${scores.length} scores` +
           (term || ev !== "all" || gm !== "all"
             ? ` · showing ${visible.length}`
             : "");
@@ -1052,12 +1043,6 @@
       el("export-all").addEventListener("click", () => {
         window.location =
           "/admin/export.csv?event=" +
-          encodeURIComponent(el("event-filter").value) +
-          gameParam();
-      });
-      el("export-claimed").addEventListener("click", () => {
-        window.location =
-          "/admin/export.csv?claimed_only=true&event=" +
           encodeURIComponent(el("event-filter").value) +
           gameParam();
       });

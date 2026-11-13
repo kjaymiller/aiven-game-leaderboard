@@ -1321,7 +1321,7 @@ async def admin_delete_score(session_id: str):
 
 @app.get("/admin/export.csv", dependencies=[Depends(require_admin)])
 @app.get("/api/v1/admin/export.csv", dependencies=[Depends(require_admin)])
-async def admin_export_csv(claimed_only: bool = False, event: str = "all", game: str | None = None):
+async def admin_export_csv(event: str = "all", game: str | None = None):
     """Download scores as CSV, for spreadsheets and follow-up. ?event=<slug> exports one event's
     entrants (for its prize draw); ?game=<slug> one game's."""
     try:
@@ -1335,7 +1335,7 @@ async def admin_export_csv(claimed_only: bool = False, event: str = "all", game:
         buffer = io.StringIO()
         writer = csv.writer(buffer)
         writer.writerow(
-            ["rank", "nickname", "company", "email", "score", "secondary", "claimed", "source",
+            ["rank", "nickname", "company", "email", "score", "secondary", "source",
              "event", "game", "played_at", "claimed_at", "session_id"]
         )
 
@@ -1343,8 +1343,6 @@ async def admin_export_csv(claimed_only: bool = False, event: str = "all", game:
         exported = 0
         for row in rows:
             position[row["game"]] = position.get(row["game"], 0) + 1
-            if claimed_only and not row["email"]:
-                continue
             writer.writerow([
                 position[row["game"]],
                 row["nickname"] or "",
@@ -1352,7 +1350,6 @@ async def admin_export_csv(claimed_only: bool = False, event: str = "all", game:
                 row["email"] or "",
                 row["score"],
                 row["secondary"] if row["secondary"] is not None else "",
-                "yes" if row["email"] else "no",
                 row["source"],
                 row["event"] or "",
                 row["game"],

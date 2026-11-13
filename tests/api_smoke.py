@@ -148,8 +148,9 @@ st, body, _ = call("GET", "/api/v1/admin/scores?game=smoke-speedrun", headers=be
 check("admin token lists one game's scores", st == 200 and body["total"] >= 3 and all(s["game"] == "smoke-speedrun" for s in body["scores"]), st)
 st, body, _ = call("GET", "/api/v1/admin/scores?game=smoke-speedrun&limit=1&offset=1", headers=bearer(admin_token), jar=False)
 check("paging works", st == 200 and len(body["scores"]) == 1)
-st, _, raw = call("GET", "/api/v1/admin/export.csv?game=smoke-speedrun&claimed_only=true", headers=bearer(admin_token), jar=False)
+st, _, raw = call("GET", "/api/v1/admin/export.csv?game=smoke-speedrun", headers=bearer(admin_token), jar=False)
 check("CSV export is filtered by game", st == 200 and b"smoke-speedrun" in raw and b"SmokeDI" not in raw and b"di@example.com" not in raw)
+check("CSV export has no claimed column", b"claimed," not in raw.split(b"\n")[0].replace(b"claimed_at", b""))
 st, _, _ = call("PUT", "/api/v1/admin/games/smoke-speedrun", {"name": "Smoke Speedrun 2", "score_label": "Time",
                 "score_format": "time_ms", "sort_order": "asc"}, bearer(admin_token), jar=False)
 check("admin token can edit a game", st == 200, st)
