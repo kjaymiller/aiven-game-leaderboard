@@ -150,7 +150,7 @@ st, body, _ = call("GET", "/api/v1/admin/scores?game=smoke-speedrun&limit=1&offs
 check("paging works", st == 200 and len(body["scores"]) == 1)
 st, _, raw = call("GET", "/api/v1/admin/export.csv?game=smoke-speedrun", headers=bearer(admin_token), jar=False)
 check("CSV export is filtered by game", st == 200 and b"smoke-speedrun" in raw and b"SmokeDI" not in raw and b"di@example.com" not in raw)
-check("CSV export has no claimed column", b"claimed," not in raw.split(b"\n")[0].replace(b"claimed_at", b""))
+check("CSV export has no claimed column", "claimed" not in raw.decode().splitlines()[0].split(","))
 st, _, _ = call("PUT", "/api/v1/admin/games/smoke-speedrun", {"name": "Smoke Speedrun 2", "score_label": "Time",
                 "score_format": "time_ms", "sort_order": "asc"}, bearer(admin_token), jar=False)
 check("admin token can edit a game", st == 200, st)
