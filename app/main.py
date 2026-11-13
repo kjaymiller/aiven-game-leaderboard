@@ -1379,8 +1379,9 @@ async def admin_export_csv(claimed_only: bool = False, event: str = "all", game:
 @app.get("/api/admin/emails")
 async def get_emails(admin_key: str = None):
     """Get all collected emails - protected endpoint for business use"""
-    # Simple admin protection - in production use proper authentication
-    if admin_key != os.getenv("ADMIN_KEY", "your_secret_admin_key"):
+    # Fail closed: with no ADMIN_KEY configured nothing can match, not even a default literal
+    key = _admin_key()
+    if not key or not admin_key or not hmac.compare_digest(admin_key.encode(), key.encode()):
         raise HTTPException(status_code=403, detail="Access denied")
     
     try:

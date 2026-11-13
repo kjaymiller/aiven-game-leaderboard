@@ -42,12 +42,36 @@ In short: create the game and a token in `/admin`, then have your game **server*
 The legacy Disk Invaders endpoints (`/api/scores`, `/api/leaderboard`,
 `/api/check-high-score/...`) are kept so the current game keeps working.
 
+## Signing in and API tokens
+
+**Console sign-in.** Open `/admin` and enter the `ADMIN_KEY` password. The server swaps it for
+a signed, HttpOnly session cookie (12 hours). `ADMIN_KEY` must be set: if it is not, the
+console fails closed and `POST /admin/login` returns `503`. Rotating `ADMIN_KEY` ends every
+live session. Tokens cannot be used on the console password form.
+
+**Tokens (API tab).** The console's **API** tab mints database-backed tokens
+(`GET/POST/DELETE /admin/api/tokens`, console session only). Pick a kind:
+
+- **Game token**: scoped to one game; lets that game's server `POST /api/v1/scores`.
+- **Admin token**: can call the management API (`/api/v1/admin/...`, see `/docs`) but cannot
+  create or revoke tokens.
+
+The token (`lbk_...`) is shown **once** when created. Only its hash is stored, so a lost token
+has to be revoked and replaced. Treat both kinds as secrets; an admin token gives full
+management access to scores, games and events. Revoke tokens you no longer need in the API tab.
+
+Send a token as a bearer header. No session-cookie exchange is needed:
+
+```bash
+curl -H "Authorization: Bearer $ADMIN_TOKEN" http://localhost:8000/api/v1/admin/games
+```
+
 ## Configuration
 
 | Variable | Required | Notes |
 |---|---|---|
 | `DATABASE_URL` | yes | PostgreSQL connection string. Tables are created and migrated at startup |
-| `ADMIN_KEY` | yes | Admin console password |
+| `ADMIN_KEY` | yes | Admin console password. If unset, `/admin/login` returns 503 and the legacy `/api/admin/emails` rejects every request |
 | `INGEST_SECRET` | no | When set, the legacy `/api/scores` endpoint requires `X-Ingest-Secret` |
 | `CORS_ORIGINS` | no | Comma-separated origins |
 | `PUBLIC_LEADERBOARD_URL` | no | Stable base URL for event leaderboard links and QR codes. Default: the host the admin console is opened on |
